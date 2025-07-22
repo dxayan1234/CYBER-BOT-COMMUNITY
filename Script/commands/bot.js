@@ -56,8 +56,8 @@ module.exports.handleEvent = async function({ api, event, args, Threads, Users }
      return api.sendMessage("~ তোমার বাল উঠে নাই নাকি তোমার?? 🤖", threadID);
    };
 
-  if ((event.body.toLowerCase() == "@war") || (event.body.toLowerCase() == "Ayan bai") || (event.body.toLowerCase() == "@Ayan ッ") || (event.body.toLowerCase() == "@Ayan ッ") || (event.body.toLowerCase() == "আয়ান")) {
-     return api.sendMessage("খানকির পোলা তোর মারে চুদে ভদা ফাটাই ফেলবো🥵👿🖕", " তোর বাপ আয়ান হিজলা মাগির পুত🤣🫦🤌💦..!😘",threadID);
+  if ((event.body.toLowerCase() == "war") || (event.body.toLowerCase() == "Ayan bai") || (event.body.toLowerCase() == "@Ayan ッ") || (event.body.toLowerCase() == "@Ayan ッ") || (event.body.toLowerCase() == "আয়ান")) {
+     return api.sendMessage("খানকির পোলা তোর মারে চুদে ভদা ফাটাই ফেলবো🥵👿🖕", "তোর বাপ আয়ান হিজলা মাগির পুত🤣🫦🤌💦..!😘",threadID);
 
        
    };
