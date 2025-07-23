@@ -1,124 +1,112 @@
-module.exports.config = {
-        name: "help",
-        version: "1.0.2",
-        hasPermssion: 0,
-        credits: "𝐂𝐘𝐁𝐄𝐑 ☢️_𖣘 -𝐁𝐎𝐓 ⚠️ 𝑻𝑬𝑨𝑴_ ☢️",
-        description: "FREE SET-UP MESSENGER",
-        commandCategory: "system",
-        usages: "[Name module]",
-        cooldowns: 5,
-        envConfig: {
-                autoUnsend: true,
-                delayUnsend: 20
+const fs = require("fs");
+
+module.exports = {
+    name: "help",
+    description: "View command information with an enhanced interface.",
+    permission: 0,
+    cooldown: 5,
+    
+    // দ্রষ্টব্য: এই কোডটি ধরে নিচ্ছে যে আপনার Mirai bot instance ('bot') এর মধ্যে নিম্নলিখিত বৈশিষ্ট্যগুলো আছে:
+    // - bot.commands: একটি Map, যেখানে সব রেজিস্টার্ড কমান্ড আছে (key: কমান্ডের নাম, value: কমান্ড অবজেক্ট)।
+    // - bot.aliases: একটি Map, যেখানে alias থেকে মূল কমান্ডের নাম পাওয়া যায়।
+    // - bot.prefix: বটের বর্তমান প্রিফিক্স।
+    // আপনার বটের কাঠামো অনুযায়ী এই অংশগুলো পরিবর্তন করতে হতে পারে।
+
+    async execute(bot, event, args) {
+        const { commands, aliases, prefix } = bot; // আপনার bot অবজেক্ট থেকে কমান্ড ও প্রিফিক্স নিন
+        const commandName = args[0]?.toLowerCase();
+
+        // ছবি URL (আপনার পছন্দের ব্যানার)
+        const bannerUrl = "https://i.imgur.com/ukbnuXS.png"; // ব্যানার ইমেজ URL
+
+        // 1. নির্দিষ্ট ক্যাটাগরির কমান্ড দেখানোর জন্য (help c <category>)
+        if (commandName === 'c' && args[1]) {
+            const categoryArg = args[1].toUpperCase();
+            const commandsInCategory = [];
+
+            for (const cmd of commands.values()) {
+                const category = cmd.category?.toUpperCase() || "GENERAL";
+                if (category === categoryArg) {
+                    commandsInCategory.push(cmd.name);
+                }
+            }
+
+            if (commandsInCategory.length === 0) {
+                return bot.sendGroupMessage(event.groupId, [{ type: 'Plain', text: `❌ No commands found in category: ${categoryArg}` }]);
+            }
+
+            let replyMsg = "╔══════════◇◆◇══════════╗\n"
+                         + "      BOT COMMAND LIST\n"
+                         + "╠══════════◇◆◇══════════╣";
+            replyMsg += `\n   ┌────── ${categoryArg} ──────┐\n`;
+
+            commandsInCategory.sort().forEach(name => {
+                replyMsg += `║ │ 🟢 ${name}\n`;
+            });
+
+            replyMsg += "║ └─────────────────┘\n"
+                      + "╚══════════◇◆◇══════════╝\n\n";
+            replyMsg += `📊 Total Commands in this category: ${commandsInCategory.length}`;
+
+            return bot.sendGroupMessage(event.groupId, [{ type: 'Plain', text: replyMsg }]);
         }
-};
 
-module.exports.languages = {
- "en": {
-    "moduleInfo": "╭──────•◈•──────╮\n |        𝗜𝘀𝗹𝗮𝗺𝗶𝗰𝗸 𝗰𝗵𝗮𝘁 𝗯𝗼𝘁\n |●𝗡𝗮𝗺𝗲: •—» %1 «—•\n |●𝗨𝘀𝗮𝗴𝗲: %3\n |●𝗗𝗲𝘀𝗰𝗿𝗶p𝘁𝗶𝗼𝗻: %2\n |●𝗖𝗮𝘁𝗲𝗴𝗼𝗿𝘆: %4\n |●𝗪𝗮𝗶𝘁𝗶𝗻𝗴 𝘁𝗶𝗺𝗲: %5 seconds(s)\n |●𝗣𝗲𝗿𝗺𝗶𝘀𝘀𝗶𝗼𝗻: %6\n |𝗠𝗼𝗱𝘂𝗹𝗲 𝗰𝗼𝗱𝗲 𝗯𝘆\n |•—» Ullash ッ «—•\n╰──────•◈•──────╯",
-    "helpList": '[ There are %1 commands on this bot, Use: "%2help nameCommand" to know how to use! ]',
-    "user": "User",
-        "adminGroup": "Admin group",
-        "adminBot": "Admin bot"
-  }
-};
+        // 2. একটি নির্দিষ্ট কমান্ডের বিস্তারিত তথ্য দেখানোর জন্য (help <command>)
+        if (commandName && commandName !== 'all') {
+            const cmd = commands.get(commandName) || commands.get(aliases.get(commandName));
+            if (!cmd) {
+                return bot.sendGroupMessage(event.groupId, [{ type: 'Plain', text: `⚠️ Command '${commandName}' not found!` }]);
+            }
 
-module.exports.handleEvent = function ({ api, event, getText }) {
- const { commands } = global.client;
- const { threadID, messageID, body } = event;
+            const roleText = (role => {
+                switch (role) {
+                    case 1: return "👑 Group Admins";
+                    case 2: return "⚡ Bot Admins";
+                    default: return "👥 All Users";
+                }
+            })(cmd.permission);
 
- if (!body || typeof body == "undefined" || body.indexOf("help") != 0) return;
- const splitBody = body.slice(body.indexOf("help")).trim().split(/\s+/);
- if (splitBody.length == 1 || !commands.has(splitBody[1].toLowerCase())) return;
- const threadSetting = global.data.threadData.get(parseInt(threadID)) || {};
- const command = commands.get(splitBody[1].toLowerCase());
- const prefix = (threadSetting.hasOwnProperty("PREFIX")) ? threadSetting.PREFIX : global.config.PREFIX;
- return api.sendMessage(getText("moduleInfo", command.config.name, command.config.description, `${prefix}${command.config.name} ${(command.config.usages) ? command.config.usages : ""}`, command.config.commandCategory, command.config.cooldowns, ((command.config.hasPermssion == 0) ? getText("user") : (command.config.hasPermssion == 1) ? getText("adminGroup") : getText("adminBot")), command.config.credits), threadID, messageID);
-}
+            const usage = (cmd.guide || cmd.usages || "No usage guide available.")
+                .replace(/\{pn\}/g, `${prefix}${cmd.name}`);
 
-module.exports. run = function({ api, event, args, getText }) {
-  const axios = require("axios");
-  const request = require('request');
-  const fs = require("fs-extra");
- const { commands } = global.client;
- const { threadID, messageID } = event;
- const command = commands.get((args[0] || "").toLowerCase());
- const threadSetting = global.data.threadData.get(parseInt(threadID)) || {};
- const { autoUnsend, delayUnsend } = global.configModule[this.config.name];
- const prefix = (threadSetting.hasOwnProperty("PREFIX")) ? threadSetting.PREFIX : global.config.PREFIX;
-if (args[0] == "all") {
-    const command = commands.values();
-    var group = [], msg = "";
-    for (const commandConfig of command) {
-      if (!group.some(item => item.group.toLowerCase() == commandConfig.config.commandCategory.toLowerCase())) group.push({ group: commandConfig.config.commandCategory.toLowerCase(), cmds: [commandConfig.config.name] });
-      else group.find(item => item.group.toLowerCase() == commandConfig.config.commandCategory.toLowerCase()).cmds.push(commandConfig.config.name);
-    }
-    group.forEach(commandGroup => msg += `❄️ ${commandGroup.group.charAt(0).toUpperCase() + commandGroup.group.slice(1)} \n${commandGroup.cmds.join(' • ')}\n\n`);
+            let replyMsg = "╔══════════◇◆◇══════════╗\n"
+                         + "║           COMMAND INFORMATION      \n"
+                         + "╠══════════◇◆◇══════════╣\n"
+                         + `║ 🏷️ Name: ${cmd.name}\n`
+                         + `║ 📝 Description: ${cmd.description || 'No description'}\n`
+                         + `║ 📂 Category: ${cmd.category?.toUpperCase() || 'GENERAL'}\n`
+                         + `║ 🔤 Aliases: ${cmd.aliases?.join(", ") || 'None'}\n`
+                         + `║ 🔒 Permissions: ${roleText}\n`
+                         + `║ ⏱️ Cooldown: ${cmd.cooldown || 1}s\n`
+                         + `║ 👤 Author: ${cmd.author || 'Unknown'}\n`
+                         + "╠══════════◇◆◇══════════╣\n"
+                         + "║ 🛠️ USAGE GUIDE\n"
+                         + ` ║ ${usage.split("\n").join("\n ║ ")}\n`
+                         + "╚══════════◇◆◇══════════╝";
 
-    return axios.get('https://loidsenpaihelpapi.miraiandgoat.repl.co').then(res => {
-    let ext = res.data.data.substring(res.data.data.lastIndexOf(".") + 1);
-      let admID = "61551846081032";
-
-      api.getUserInfo(parseInt(admID), (err, data) => {
-      if(err){ return console.log(err)}
-     var obj = Object.keys(data);
-    var firstname = data[obj].name.replace("@", "");
-    let callback = function () {
-        api.sendMessage({ body:`✿🄲🄾🄼🄼🄰🄽🄳 🄻🄸🅂🅃✿\n\n` + msg + `✿══════════════✿\n│𝗨𝘀𝗲 ${prefix}help [Name?]\n│𝗨𝘀𝗲 ${prefix}help [Page?]\n│𝗡𝗔𝗠𝗘 𝗢𝗪𝗡𝗘𝗥 : │Ullash ッ\n│𝗧𝗢𝗧𝗔𝗟 :  ${commands.size}\n————————————`, mentions: [{
-                           tag: firstname,
-                           id: admID,
-                           fromIndex: 0,
-                 }],
-            attachment: fs.createReadStream(__dirname + `/cache/472.${ext}`)
-        }, event.threadID, (err, info) => {
-        fs.unlinkSync(__dirname + `/cache/472.${ext}`);
-        if (autoUnsend == false) {
-            setTimeout(() => {
-                return api.unsendMessage(info.messageID);
-            }, delayUnsend * 1000);
+            return bot.sendGroupMessage(event.groupId, [{ type: 'Plain', text: replyMsg }]);
         }
-        else return;
-    }, event.messageID);
+
+        // 3. সব কমান্ড দেখানোর জন্য (help বা help all)
+        const categories = new Map();
+        for (const cmd of commands.values()) {
+            const category = cmd.category?.toUpperCase() || "GENERAL";
+            if (!categories.has(category)) {
+                categories.set(category, []);
+            }
+            categories.get(category).push(cmd.name);
         }
-         request(res.data.data).pipe(fs.createWriteStream(__dirname + `/cache/472.${ext}`)).on("close", callback);
-     })
-      })
-};
- if (!command) {
-  const arrayInfo = [];
-  const page = parseInt(args[0]) || 1;
-    const numberOfOnePage = 15;
-    let i = 0;
-    let msg = "";
 
-    for (var [name, value] of (commands)) {
-      name += ``;
-      arrayInfo.push(name);
-    }
+        const sortedCategories = [...categories.keys()].sort();
+        let replyMsg = "╔══════════◇◆◇══════════╗\n"
+                     + "      BOT COMMAND LIST\n"
+                     + "╠══════════◇◆◇══════════╣\n";
+        
+        let totalCommands = 0;
 
-    arrayInfo.sort((a, b) => a.data - b.data);  
-const first = numberOfOnePage * page - numberOfOnePage;
-   i = first;
-   const helpView = arrayInfo.slice(first, first + numberOfOnePage);
+        for (const category of sortedCategories) {
+            const commandsInCategory = categories.get(category).sort();
+            totalCommands += commandsInCategory.length;
 
-
-   for (let cmds of helpView) msg += `•—»[ ${cmds} ]«—•\n`;
-    const siu = `╭──────•◈•──────╮\n |        𝗜𝘀𝗹𝗮𝗺𝗶𝗰𝗸 𝗰𝗵𝗮𝘁 𝗯𝗼𝘁 \n |   🄲🄾🄼🄼🄰🄽🄳 🄻🄸🅂🅃       \n╰──────•◈•──────╯`;
-const text = `╭──────•◈•──────╮\n│𝗨𝘀𝗲 ${prefix}help [Name?]\n│𝗨𝘀𝗲 ${prefix}help [Page?]\n│𝗡𝗔𝗠𝗘 𝗢𝗪𝗡𝗘𝗥 : │ Ullash ッ\n│𝗧𝗢𝗧𝗔𝗟 : [${arrayInfo.length}]\n│📛🄿🄰🄶🄴📛 :  [${page}/${Math.ceil(arrayInfo.length/numberOfOnePage)}]\n╰──────•◈•──────╯`; 
-    var link = [
-"https://i.imgur.com/HPaSlBu.jpeg", "https://i.imgur.com/HPaSlBu.jpeg", "https://i.imgur.com/WXQIgMz.jpeg", "https://i.postimg.cc/QdgH08j6/Messenger-creation-C2-A39-DCF-A8-E7-4-FC7-8715-2559476-FEEF4.gif",
-"https://i.imgur.com/WXQIgMz.jpeg",
-"https://i.imgur.com/ybM9Wtr.jpeg",
-"https://i.imgur.com/HPaSlBu.jpeg",
-    ]
-     var callback = () => api.sendMessage({ body: siu + "\n\n" + msg  + text, attachment: fs.createReadStream(__dirname + "/cache/loidbutter.jpg")}, event.threadID, () => fs.unlinkSync(__dirname + "/cache/loidbutter.jpg"), event.messageID);
-    return request(encodeURI(link[Math.floor(Math.random() * link.length)])).pipe(fs.createWriteStream(__dirname + "/cache/loidbutter.jpg")).on("close", () => callback());
- }
-const leiamname = getText("moduleInfo", command.config.name, command.config.description, `${(command.config.usages) ? command.config.usages : ""}`, command.config.commandCategory, command.config.cooldowns, ((command.config.hasPermssion == 0) ? getText("user") : (command.config.hasPermssion == 1) ? getText("adminGroup") : getText("adminBot")), command.config.credits);
-
-  var link = [
-"https://i.postimg.cc/QdgH08j6/Messenger-creation-C2-A39-DCF-A8-E7-4-FC7-8715-2559476-FEEF4.gif",
-  ]
-    var callback = () => api.sendMessage({ body: leiamname, attachment: fs.createReadStream(__dirname + "/cache/loidbutter.jpg")}, event.threadID, () => fs.unlinkSync(__dirname + "/cache/loidbutter.jpg"), event.messageID);
-return request(encodeURI(link[Math.floor(Math.random() * link.length)])).pipe(fs.createWriteStream(__dirname + "/cache/loidbutter.jpg")).on("close", () => callback());
-};
+            replyMsg += `\n   ┌────── ${category} ──────┐\n`;
+       
