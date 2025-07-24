@@ -57,13 +57,13 @@ module.exports.handleEvent = async function({ api, event, args, Threads, Users }
    };
 
   if ((event.body.toLowerCase() == "war") || (event.body.toLowerCase() == "Ayan bai") || (event.body.toLowerCase() == "@Ayan ッ") || (event.body.toLowerCase() == "@Ayan ッ") || (event.body.toLowerCase() == "আয়ান")) {
-     return api.sendMessage("খানকির পোলা তোর মারে চুদে ভদা ফাটাই ফেলবো🥵👿🖕", "তোর বাপ আয়ান হিজলা মাগির পুত🤣🫦🤌💦..!😘",threadID);
+     return api.sendMessage("খানকির পোলা তোর মারে চুদে ভদা ফাটাই ফেলবো..!🥵😈🖕",threadID);
 
        
    };
 
    if ((event.body.toLowerCase() == "owner") || (event.body.toLowerCase() == "ceo")) {
-     return api.sendMessage("‎[𝐎𝐖𝐍𝐄𝐑:☞ Ayan ッ ☜\n𝚈𝚘𝚞 𝙲𝚊𝚗 𝙲𝚊𝚕𝚕 𝙷𝚒𝚖 Ayan.\n𝐇𝐢𝐬 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 𝐢𝐝 :- https://www.facebook.com/mxzayan\nতার সাতে যোগা যোগ করবেন WhatsApp :- +0175570***", threadID);
+     return api.sendMessage("‎[𝐎𝐖𝐍𝐄𝐑:☞ Ayan ッ ☜\n𝚈𝚘𝚞 𝙲𝚊𝚗 𝙲𝚊𝚕𝚕 𝙷𝚒𝚖 Ayan.\n𝐇𝐢𝐬 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 𝐢𝐝 :- https://www.facebook.com/profile.php?id=61551722742977\nতার সাতে যোগা যোগ করবেন WhatsApp :- +0175570***", threadID);
    };
 
    if ((event.body.toLowerCase() == "Tor boss ke") || (event.body.toLowerCase() == "admin ke ")) {
