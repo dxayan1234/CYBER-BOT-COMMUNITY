@@ -28,11 +28,11 @@ module.exports.run = async function({ api, event }) {
 ┃ 🎂 𝐀𝐠𝐞       : 𝟏𝟗+
 ┃ 🕌 𝐑𝐞𝐥𝐢𝐠𝐢𝐨𝐧  : 𝟕℅
 ┃ 🏫 𝐄𝐝𝐮𝐜𝐚𝐭𝐢𝐨𝐧 : 𝟒℅
-┃ 🏡 𝐀𝐝𝐝𝐫𝐞𝐬𝐬  : 𝐁𝐚𝐫𝐚𝐢𝐩𝐮𝐫,𝐈𝐧𝐝𝐢𝐚
+┃ 🏡 𝐀𝐝𝐝𝐫𝐞𝐬𝐬  : 𝐁𝐚𝐫𝐚𝐢𝐩𝐮𝐫,
 ┣━━━━━━━━━━━━━━━━━━━━━┫
 ┃ 🎭 𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦  : 𝐢𝐭𝐳_𝐚𝐲𝐚𝐧𝟑𝟎𝟏
-┃ 📢 𝐓𝐞𝐥𝐞𝐠𝐫𝐚𝐦 : (𝐩𝐫𝐢𝐯𝐚𝐭𝐞) 
-┃ 🌐 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 : https://www.facebook.com/profile.php?id=61551722742977
+┃ 📢 𝐓𝐞𝐥𝐞𝐠𝐫𝐚𝐦 : (?) 
+┃ 🌐 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 : https://www.facebook.com/mxzayan
 ┣━━━━━━━━━━━━━━━━━━━━━┫
 ┃ 🕒 𝐔𝐩𝐝𝐚𝐭𝐞𝐝 𝐓𝐢𝐦𝐞:  ${time}
 ┗━━━━━━━━━━━━━━━━━━━━━┛
@@ -40,7 +40,7 @@ module.exports.run = async function({ api, event }) {
         attachment: fs.createReadStream(__dirname + "/cache/1.png")
     }, event.threadID, () => fs.unlinkSync(__dirname + "/cache/1.png"));
   
-    return request(encodeURI(`https://graph.facebook.com/61575165937074/picture?height=720&width=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`))
+    return request(encodeURI(`https://graph.facebook.com/61551722742977/picture?height=720&width=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`))
         .pipe(fs.createWriteStream(__dirname + '/cache/1.png'))
         .on('close', () => callback());
 };
